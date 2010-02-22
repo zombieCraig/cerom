@@ -533,7 +533,10 @@ int ReadModules(int command,int argc, char **argv) {
 #endif
 			
 			printf("Extracting %s ...\n",modules[i].fileaddr);
-			mkdir(binfile, 0755);
+			if(binfile[0] == 0) {
+				binfile[0] = '.';
+				binfile[1] = 0;
+			} else mkdir(binfile, 0755);
 			sprintf(name,"%s/%s",binfile,modules[i].fileaddr);
 			if (!(r=fopen(name,"wb"))) {
 				printf("Unable to open %s\n",name);
@@ -784,7 +787,10 @@ int ReadFiles(int command,int argc, char **argv) {
 				if (!k) continue;
 			}
 			printf("Extracting %s ...\n",files[i].fileaddr);
-			mkdir(binfile, 0755);
+			if(binfile[0] == 0) {
+				binfile[0] = '.';
+				binfile[1] = 0;
+			} else mkdir(binfile, 0755);
 			sprintf(name,"%s/%s",binfile,files[i].fileaddr);
 			if (!VirtualSeek(files[i].offset)) {
 				printf("Unable to read block file\n");
