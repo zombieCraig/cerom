@@ -565,7 +565,8 @@ int ReadModules(int command,int argc, char **argv) {
 			memset(&pe32, 0, sizeof(pe32));
 			pe32.e32_magic[0]= 'P';
 			pe32.e32_magic[1]= 'E';
-			pe32.e32_cpu= 0x0300;
+			//pe32.e32_cpu= 0x0300;
+			pe32.e32_cpu= 0x01A6;
 			pe32.e32_objcnt= e32hdr.e32_objcnt;
 			t=modules[i].time;
 			t<<=(__int64)32;
