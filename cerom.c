@@ -537,7 +537,7 @@ int ReadModules(int command,int argc, char **argv) {
 				binfile[0] = '.';
 				binfile[1] = 0;
 			} else mkdir(binfile, 0755);
-			sprintf(name,"%s/%s",binfile,modules[i].fileaddr);
+			snprintf(name, 1024, "%s/%s",binfile,modules[i].fileaddr);
 			if (!(r=fopen(name,"wb"))) {
 				printf("Unable to open %s\n",name);
 				return 0;
@@ -791,7 +791,7 @@ int ReadFiles(int command,int argc, char **argv) {
 				binfile[0] = '.';
 				binfile[1] = 0;
 			} else mkdir(binfile, 0755);
-			sprintf(name,"%s/%s",binfile,files[i].fileaddr);
+			snprintf(name,1024,"%s/%s",binfile,files[i].fileaddr);
 			if (!VirtualSeek(files[i].offset)) {
 				printf("Unable to read block file\n");
 				return 0;
@@ -882,11 +882,17 @@ void usage(char *a)
 	printf("%s v"VERSION" (c) 2010 Craig Smith\n", a);
 	printf("Original Bysin 1.2g by bysin (ported by guicide)\n\n");
 
-	printf("%s <filename> <command>\n",a);
+	printf("%s <command> <filename> <options>\n",a);
 	printf("Valid commands are:\n");
 	printf("  list                    - lists contents\n");
 	printf("  extract [files...]      - extract all/specified files\n");
 	printf("  update outfile [infile] - update specified files\n");
+	printf("\n");
+	printf("You can also use shorthand (first letter) for the commands\n");
+	printf("Example:\n\n");
+	printf("    %s l 09AVN2.bin\n",a);
+	printf("    %s x 09AVN2.bin HMIManager.dll\n",a);
+	printf("    %s u 09AVN2.bin HMIManager.dll HMIManager2.dll\n",a);
 	}
 
 int main(int argc, char **argv) 
@@ -900,11 +906,11 @@ int main(int argc, char **argv)
 		return 0;
 		}
 
-	if (!strcasecmp(argv[2],"list")) 
+	if (!strcasecmp(argv[1],"list") || argv[1][0] == 'l') 
 		command=COMMAND_LIST;
-	else if (!strcasecmp(argv[2],"extract")) 
+	else if (!strcasecmp(argv[1],"extract") || argv[1][0] == 'x') 
 		command=COMMAND_EXTRACT;
-	else if (!strcasecmp(argv[2],"update") && argc >= 4) 
+	else if ((!strcasecmp(argv[1],"update") || argv[1][0] == 'u') && argc >= 4) 
 		command=COMMAND_UPDATE;
 	else 
 		{
@@ -912,17 +918,17 @@ int main(int argc, char **argv)
 		return 0;
 		}
 
-	for (ptr=argv[1],ptr2=binfile;*ptr && *ptr != '.';ptr++,ptr2++) 
+	for (ptr=argv[2],ptr2=binfile;*ptr && *ptr != '.';ptr++,ptr2++) 
 		*ptr2 = *ptr;
 
 	*ptr2=0;
 	
-	if (!strcmp(binfile,argv[1])) 
+	if (!strcmp(binfile,argv[2])) 
 		{
 		*ptr2++='-';
 		*ptr2=0;
 		}
-	if (!(f=fopen(argv[1],"r+b"))) 
+	if (!(f=fopen(argv[2],"r+b"))) 
 		{
 		printf("Unable to open BIN file (%s) for reading and writing\n",argv[1]);
 		return 0;
